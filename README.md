@@ -1,4 +1,7 @@
 # task-tracker
 
 
-<h3> Task tracker is a project used to track and manage your tasks. In this task, you will build a simple command line interface (CLI) to track what you need to do, what you have done, and what you are currently working on. This project will help you practice your programming skills, including working with the filesystem, handling user inputs, and building a simple CLI application./ Task tracker es un proyecto que se utiliza para rastrear y administrar sus tareas. En esta tarea, creará una interfaz de línea de comandos (CLI) simple para realizar un seguimiento de lo que necesita hacer, lo que ha hecho y en qué está trabajando actualmente. Este proyecto le ayudará a practicar sus habilidades de programación, incluido trabajar con el sistema de archivos, manejar las entradas de los usuarios y crear una aplicación CLI simple.</h3>
+<h3>
+Task tracker is a project used to track and manage your tasks. In this task, you will build a simple command line interface (CLI) to track what you need to do, what you have done, and what you are currently working on. This project will help you practice your programming skills, including working with the filesystem, handling user inputs, and building a simple CLI application.
+/
+Task tracker es un proyecto que se utiliza para rastrear y administrar sus tareas. En esta tarea, creará una interfaz de línea de comandos (CLI) simple para realizar un seguimiento de lo que necesita hacer, lo que ha hecho y en qué está trabajando actualmente. Este proyecto le ayudará a practicar sus habilidades de programación, incluido trabajar con el sistema de archivos, manejar las entradas de los usuarios y crear una aplicación CLI simple.</h3>
