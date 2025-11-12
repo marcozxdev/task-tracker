@@ -6,17 +6,17 @@ import os # para la ruta de el archivo json
 # import datetime # depronto mas adelanete la use para guardar fechas
 import time
 
+
 # DATA_TASK = "task-traker-cli/data/tasks.json"
 
 # if not os.path.exists(DATA_TASK):
-#     print("no hay base de datos")
+#     print("no hay json donde se van a guardar uno")
 
 
 
 
 
 tasks = []
-
 
 
 # funciones que simulan los comandos en la terminal
@@ -31,56 +31,81 @@ def add(args): # add para añadir tareas
 
 
 def mark_done(args): # mark_done para marcar como hecho
+
+    # valida que aya argumentos
+    if not args:
+        print("please write id")
+        return
     
+    # solo usa el primer argumento para que no aya bugs
+    idtask = args[0]
+
+
+    # logica de busqueda y marcado de tarea
     for i in tasks:
-        if i["isdone"] == False:
-            print(i["ID", i["task"]])
+        index = tasks.index(i)
+        # obtiene el inice de el objeto para poder acceder directamente
+
+        ### hay un bug que falta solucionar
+        if idtask == tasks[index]["ID"]: # valida que tenga el mismo id 
+            tasks[index]["isdone"] = True # cambia el valor de la tarea
+            print(f"ID: {i["ID"]} task: {i["task"]} mark [DONE]\n")
+
+            ### nota: terminar la logica para que se guarde en el json
+            return
+    else:
+        print("it's task not exist  ")
 
 
-def mark_in_progress(args): # mark_in_progres para marcar como en progreso 
-    pass
 
 
-def list(isdone= "done" or "progress" or "all" ): # list lista todas las tareas
+
+
+# esta funcion tiene polimorfismo ya que se puede comportar diferente dependiendo de los argumentos dados
+def list(isdone= "done" or "progress" ): # list lista todas las tareas
     
-    
-    if not isdone == "done" and not isdone == "progress" and not isdone == "all" and isdone:
+
+
+    # valida los argumontos para que no haya bugs si se da un argumento como done o progress
+    if not isdone == "done" and not isdone == "progress" and  isdone:
         print("\nerror command")
         return
-
+    
+    #valida que haya tareas en la lista 
     if not tasks:
         print("no tasks, please add tasks")
+        return
 
-    if isdone == "done"  or isdone == "all":
+    # logica de mostrar las tareas que estan terminadas
+    if isdone == "done"  or not isdone:
         print("\nDONE: \n")
         for i in tasks:
             if i["isdone"] == True:
                 print(i["ID"], i["task"], "[DONE]")
     
 
-    if isdone == "progress" or isdone == "all":
+    # logica para mostrar las tareas que estan en progreso
+    if isdone == "progress" or not isdone :
         print("\nIN PROGRESS: \n")
         for i in tasks:
             if i["isdone"] == False:
                 print(i["ID"], i["task"], "[IN PROGRESS]")
     
-    
     print()
 
 
 def list_done(none): # list_done lista todas las tareas que estan hechas 
-    list("done")
+    list("done") # se llama a list("done") para que liste solo las tareas que estan hechas
 
 
 def list_in_progress(none): # lis__in_progres lista las tareas que  estan en progreso
-    list("progress")
+    list("progress") # se llama a list("progress") solo lista las tareas que estan en progreso
 
 
 # comandos existentes van de la mano con las funciones 
 commands = {
     "add": add,
     "mark-done": mark_done,
-    "mark-progress": mark_in_progress,
     "list": list,
     "list-done": list_done,
     "list-in-progress": list_in_progress
@@ -91,11 +116,9 @@ commands = {
 def menu():
 
     while True:    
-        print("\nBienvenido a Task Traker!\n")
-        print("Que desea hacer?")
+        print("\nTask Traker!\n")
         print("add <task>")
         print("mark-done <ID>")
-        print("mark-in-progress <ID>")
         print("list")
         print("list-done")
         print("list-in-progress")
@@ -123,7 +146,8 @@ def menu():
     
         if comando == "exit":
             print("bye...")
-            break
+            return
+            
         if comando in commands:
             commands[comando](arguments) # acede al dicionaro donde estan los comandos junto con las funciones como valor y las ejecuta y les da parametros si lo nesesitan
         else:
