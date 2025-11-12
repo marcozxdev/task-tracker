@@ -3,32 +3,77 @@
 # modulos necesarios para funcionar
 import json # donde se van a almacenar los datos 
 import os # para la ruta de el archivo json
+# import datetime # depronto mas adelanete la use para guardar fechas
+import time
+
+# DATA_TASK = "task-traker-cli/data/tasks.json"
+
+# if not os.path.exists(DATA_TASK):
+#     print("no hay base de datos")
+
+
+
+
+
+tasks = []
 
 
 
 # funciones que simulan los comandos en la terminal
 def add(args): # add para añadir tareas 
-    #print("\n".join(args))
+    # print(" ".join(args))
+    
+    # añado un diccionario en la lista para simular un a bases de datos 
+    
+    tasks.append({"ID": len(tasks)+1,"task": " ".join(args), "isdone": False})
+    print(f"added task: ID: {len(tasks)}  task: {' '.join(args)}")
+    
 
 
 def mark_done(args): # mark_done para marcar como hecho
-    pass
+    
+    for i in tasks:
+        if i["isdone"] == False:
+            print(i["ID", i["task"]])
 
 
 def mark_in_progress(args): # mark_in_progres para marcar como en progreso 
     pass
 
 
-def list(): # list lista todas las tareas
-    pass
+def list(isdone= "done" or "progress" or "all" ): # list lista todas las tareas
+    
+    
+    if not isdone == "done" and not isdone == "progress" and not isdone == "all" and isdone:
+        print("\nerror command")
+        return
+
+    if not tasks:
+        print("no tasks, please add tasks")
+
+    if isdone == "done"  or isdone == "all":
+        print("\nDONE: \n")
+        for i in tasks:
+            if i["isdone"] == True:
+                print(i["ID"], i["task"], "[DONE]")
+    
+
+    if isdone == "progress" or isdone == "all":
+        print("\nIN PROGRESS: \n")
+        for i in tasks:
+            if i["isdone"] == False:
+                print(i["ID"], i["task"], "[IN PROGRESS]")
+    
+    
+    print()
 
 
-def list_done(): # list_done lista todas las tareas que estan hechas 
-    pass
+def list_done(none): # list_done lista todas las tareas que estan hechas 
+    list("done")
 
 
-def list_in_progress(): # lis__in_progres lista las tareas que  estan en progreso
-    pass
+def list_in_progress(none): # lis__in_progres lista las tareas que  estan en progreso
+    list("progress")
 
 
 # comandos existentes van de la mano con las funciones 
@@ -46,7 +91,7 @@ commands = {
 def menu():
 
     while True:    
-        print("Bienvenido a Task Traker")
+        print("\nBienvenido a Task Traker!\n")
         print("Que desea hacer?")
         print("add <task>")
         print("mark-done <ID>")
@@ -57,7 +102,7 @@ def menu():
         print("exit\n")
 
         opc = input('task-cli ') # entrad de los comandos
-        
+        print()
 
         if not opc:
             print("please write")
@@ -67,7 +112,7 @@ def menu():
             print("bye...")
             break
 
-      # logica de ejecutar comandos
+    # logica de ejecutar comandos
         parts = opc.split() # divido la entrada por espacio y lo almaceno como una lista
 
         if not parts: # si no hay partes no se ejecuta lo de abajo
@@ -75,7 +120,7 @@ def menu():
 
         comando = parts[0]  # almaceno la primera palabra en este caso el comando
         arguments = parts[1:] # el resto de la entrada se podria tomar como parametro 
-      
+    
         if comando == "exit":
             print("bye...")
             break
