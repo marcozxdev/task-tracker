@@ -7,16 +7,25 @@ import os # para la ruta de el archivo json
 import time
 
 
-# DATA_TASK = "task-traker-cli/data/tasks.json"
+DATA_TASK = "task-traker-cli/data/tasks.json"
 
-# if not os.path.exists(DATA_TASK):
-#     print("no hay json donde se van a guardar uno")
+def ensure_file(file):
+    if not os.path.exists(file):  # creamos el archivo si no existe
+            with open(file, "w") as f:
+                json.dump([], f, indent=4)
 
 
+def load(file): # carga los datos que esten en el file
+    ensure_file(file)
+    with open(file, "r") as f:
+        return json.load(f)
 
+def save(path, data): # guarda los datos en  el archivo
+    with open(path, "w") as f: 
+        json.dump(data, f, indent=4)
 
-
-tasks = []
+# cargamos los datos 
+tasks: list = load(DATA_TASK)
 
 
 # funciones que simulan los comandos en la terminal
@@ -25,8 +34,9 @@ def add(args): # add para añadir tareas
     
     # añado un diccionario en la lista para simular un a bases de datos 
     
-    tasks.append({"ID": len(tasks)+1,"task": " ".join(args), "isdone": False})
+    tasks.append({"ID": int(len(tasks)+1),"task": " ".join(args), "isdone": False})
     print(f"added task: ID: {len(tasks)}  task: {' '.join(args)}")
+    save(DATA_TASK, tasks)
     
 
 
@@ -39,26 +49,45 @@ def mark_done(args): # mark_done para marcar como hecho
     
     # solo usa el primer argumento para que no aya bugs
     idtask = args[0]
-
+    try:
+        int(idtask)
+    except:
+        print("just write numbers")
+        return
 
     # logica de busqueda y marcado de tarea
     for i in tasks:
-        index = tasks.index(i)
-        # obtiene el inice de el objeto para poder acceder directamente
 
-        ### hay un bug que falta solucionar
-        if idtask == tasks[index]["ID"]: # valida que tenga el mismo id 
-            tasks[index]["isdone"] = True # cambia el valor de la tarea
-            print(f"ID: {i["ID"]} task: {i["task"]} mark [DONE]\n")
-
-            ### nota: terminar la logica para que se guarde en el json
-            return
+        if int(idtask) == i["ID"]: # valida que tenga el mismo id 
+            i["isdone"] = True # cambia el valor de la tarea                                    
+            print(f"ID: {i['ID']} task: {i['task']} mark: [DONE]\n")
+            # guardamos los datos
+            save(DATA_TASK, tasks)
+            return 
     else:
         print("it's task not exist  ")
 
 
+def delete_task(args):
+    try:
+        if not args:
+            print("please write ID")
+            return
+        
+        idtask = int(args[0])
+        
+        for i in tasks:
 
+            if idtask == i["ID"]: # valida que tenga el mismo id 
+                tasks.remove(i) # borra la tarea
+                print(f"ID: {i['ID']} task: {i['task']}  [delete] \n")
+                # se guardan los datos
+                save(DATA_TASK, tasks)
+                return 
 
+        
+    except:
+        print("just write numbers")
 
 
 # esta funcion tiene polimorfismo ya que se puede comportar diferente dependiendo de los argumentos dados
@@ -106,6 +135,7 @@ def list_in_progress(none): # lis__in_progres lista las tareas que  estan en pro
 commands = {
     "add": add,
     "mark-done": mark_done,
+    "delete": delete_task,
     "list": list,
     "list-done": list_done,
     "list-in-progress": list_in_progress
@@ -119,6 +149,7 @@ def menu():
         print("\nTask Traker!\n")
         print("add <task>")
         print("mark-done <ID>")
+        print("delete <ID>")
         print("list")
         print("list-done")
         print("list-in-progress")
