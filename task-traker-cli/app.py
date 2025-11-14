@@ -6,17 +6,26 @@ import os # para la ruta de el archivo json
 # import datetime # depronto mas adelanete la use para guardar fechas
 import time
 
-# DATA_TASK = "task-traker-cli/data/tasks.json"
 
-# if not os.path.exists(DATA_TASK):
-#     print("no hay base de datos")
+DATA_TASK = "task-traker-cli/data/tasks.json"
+
+def ensure_file(file):
+    if not os.path.exists(file):  # creamos el archivo si no existe
+            with open(file, "w") as f:
+                json.dump([], f, indent=4)
 
 
+def load(file): # carga los datos que esten en el file
+    ensure_file(file)
+    with open(file, "r") as f:
+        return json.load(f)
 
+def save(path, data): # guarda los datos en  el archivo
+    with open(path, "w") as f: 
+        json.dump(data, f, indent=4)
 
-
-tasks = []
-
+# cargamos los datos 
+tasks: list = load(DATA_TASK)
 
 
 # funciones que simulan los comandos en la terminal
@@ -25,62 +34,108 @@ def add(args): # add para añadir tareas
     
     # añado un diccionario en la lista para simular un a bases de datos 
     
-    tasks.append({"ID": len(tasks)+1,"task": " ".join(args), "isdone": False})
+    tasks.append({"ID": int(len(tasks)+1),"task": " ".join(args), "isdone": False})
     print(f"added task: ID: {len(tasks)}  task: {' '.join(args)}")
+    save(DATA_TASK, tasks)
     
 
 
 def mark_done(args): # mark_done para marcar como hecho
+
+    # valida que aya argumentos
+    if not args:
+        print("please write id")
+        return
     
-    for i in tasks:
-        if i["isdone"] == False:
-            print(i["ID", i["task"]])
-
-
-def mark_in_progress(args): # mark_in_progres para marcar como en progreso 
-    pass
-
-
-def list(isdone= "done" or "progress" or "all" ): # list lista todas las tareas
-    
-    
-    if not isdone == "done" and not isdone == "progress" and not isdone == "all" and isdone:
-        print("\nerror command")
+    # solo usa el primer argumento para que no aya bugs
+    idtask = args[0]
+    try:
+        int(idtask)
+    except:
+        print("just write numbers")
         return
 
+    # logica de busqueda y marcado de tarea
+    for i in tasks:
+
+        if int(idtask) == i["ID"]: # valida que tenga el mismo id 
+            i["isdone"] = True # cambia el valor de la tarea                                    
+            print(f"ID: {i['ID']} task: {i['task']} mark: [DONE]\n")
+            # guardamos los datos
+            save(DATA_TASK, tasks)
+            return 
+    else:
+        print("it's task not exist  ")
+
+
+def delete_task(args):
+    try:
+        if not args:
+            print("please write ID")
+            return
+        
+        idtask = int(args[0])
+        
+        for i in tasks:
+
+            if idtask == i["ID"]: # valida que tenga el mismo id 
+                tasks.remove(i) # borra la tarea
+                print(f"ID: {i['ID']} task: {i['task']}  [delete] \n")
+                # se guardan los datos
+                save(DATA_TASK, tasks)
+                return 
+
+        
+    except:
+        print("just write numbers")
+
+
+# esta funcion tiene polimorfismo ya que se puede comportar diferente dependiendo de los argumentos dados
+def list(isdone= "done" or "progress" ): # list lista todas las tareas
+    
+
+
+    # valida los argumontos para que no haya bugs si se da un argumento como done o progress
+    if not isdone == "done" and not isdone == "progress" and  isdone:
+        print("\nerror command")
+        return
+    
+    #valida que haya tareas en la lista 
     if not tasks:
         print("no tasks, please add tasks")
+        return
 
-    if isdone == "done"  or isdone == "all":
+    # logica de mostrar las tareas que estan terminadas
+    if isdone == "done"  or not isdone:
         print("\nDONE: \n")
         for i in tasks:
             if i["isdone"] == True:
                 print(i["ID"], i["task"], "[DONE]")
     
 
-    if isdone == "progress" or isdone == "all":
+    # logica para mostrar las tareas que estan en progreso
+    if isdone == "progress" or not isdone :
         print("\nIN PROGRESS: \n")
         for i in tasks:
             if i["isdone"] == False:
                 print(i["ID"], i["task"], "[IN PROGRESS]")
     
-    
     print()
 
 
 def list_done(none): # list_done lista todas las tareas que estan hechas 
-    list("done")
+    list("done") # se llama a list("done") para que liste solo las tareas que estan hechas
 
 
 def list_in_progress(none): # lis__in_progres lista las tareas que  estan en progreso
-    list("progress")
+    list("progress") # se llama a list("progress") solo lista las tareas que estan en progreso
 
 
 # comandos existentes van de la mano con las funciones 
 commands = {
     "add": add,
     "mark-done": mark_done,
-    "mark-progress": mark_in_progress,
+    "delete": delete_task,
     "list": list,
     "list-done": list_done,
     "list-in-progress": list_in_progress
@@ -91,11 +146,10 @@ commands = {
 def menu():
 
     while True:    
-        print("\nBienvenido a Task Traker!\n")
-        print("Que desea hacer?")
+        print("\nTask Traker!\n")
         print("add <task>")
         print("mark-done <ID>")
-        print("mark-in-progress <ID>")
+        print("delete <ID>")
         print("list")
         print("list-done")
         print("list-in-progress")
@@ -123,7 +177,8 @@ def menu():
     
         if comando == "exit":
             print("bye...")
-            break
+            return
+            
         if comando in commands:
             commands[comando](arguments) # acede al dicionaro donde estan los comandos junto con las funciones como valor y las ejecuta y les da parametros si lo nesesitan
         else:
